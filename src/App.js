@@ -16,7 +16,7 @@ import cityCalc from "./cityCalcs";
 import { GridHelper } from "three";
 
 const material = new THREE.MeshStandardMaterial({
-  color: "#269",
+  color: "#219",
 });
 
 const camera = new THREE.PerspectiveCamera(
@@ -52,7 +52,6 @@ const App = () => (
     <Header />
 
     <Canvas camera={{ fov: 90, position: [0, 4, 6] }}>
-      <Plane args={[100, 100]} rotation={[Math.PI / 2, 0, 0]}></Plane>
       <gridHelper />
       <ambientLight intensity={0.25} />
       <pointLight position={[10, 10, 10]} castShadow={true} />
@@ -66,6 +65,8 @@ const App = () => (
         ))}
         {cityValue.map((value, index) => (
           <Text
+            anchorY="bottom"
+            maxWidth={BARWIDTH - 0.1}
             fontSize={0.13}
             position={[(BARWIDTH + GAP) * index, 0.18, 0.6]}
           >
