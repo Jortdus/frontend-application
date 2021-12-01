@@ -1,52 +1,81 @@
 import * as THREE from "three";
 import React, { useRef, useState } from "react";
-import { Canvas, useFrame } from '@react-three/fiber'
-import { softShadows, MeshWobbleMaterial, OrbitControls, Text } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+  softShadows,
+  MeshWobbleMaterial,
+  OrbitControls,
+  Text,
+  Plane,
+} from "@react-three/drei";
 import Header from "./components/header";
 import { useSpring, a } from "@react-spring/three";
-import './App.css';
+import "./App.css";
+import calcHeight from "./heightCalcs";
+import cityCalc from "./cityCalcs";
+import { GridHelper } from "three";
 
-softShadows()
+const material = new THREE.MeshStandardMaterial({
+  color: "#269",
+});
 
-function Box(props) {
-	// This reference gives us direct access to the THREE.Mesh object
-	const ref = useRef()
-	// Hold state for hovered and clicked events
-	const [hovered, hover] = useState(false)
-	const [clicked, click] = useState(false)
-	// Subscribe this component to the render-loop, rotate the mesh every frame
-	useFrame((state, delta) => {
-		// ref.current.rotation.y += delta / 2
-		// ref.current.rotation.x += delta / 3
-	})
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  1,
+  10000
+);
+const max = 55000;
+const barValues = calcHeight();
+const cityValue = cityCalc();
 
-	// Return the view, these are regular Threejs elements expressed in JSX
-	return (
-	<group {...props}>
-		<mesh
-		visible={true}
-		position={[0,0,-0.55]}
-		ref={ref}
-		scale={clicked ? 1.5 : 1}
-		onClick={(event) => click(!clicked)}
-		onPointerOver={(event) => hover(true)}
-		onPointerOut={(event) => hover(false)}>
-		<boxGeometry args={[1, 1, 1]} />
-		<meshStandardMaterial color={hovered ? 'blue' : 'orange'} />
-		
-		</mesh>
-		<Text position={[0, 0, 0]} color="black" anchorX="center" anchorY="middle">text</Text>
-	</group>
-	)
-  }
+const BARWIDTH = 1;
+const GAP = 0.1;
 
-  const App = () => (
-	<Canvas>
-		<ambientLight />
-		<pointLight position={[10, 10, -10]} />
-		<Box position={[0, -1, 0]} />
-		<OrbitControls></OrbitControls>
-	</Canvas>
-  )
+function Box({ value, ...props }) {
+  const ref = useRef();
+  let height = (4 / max) * value;
+  return (
+    <group {...props}>
+      <mesh visible={true} ref={ref} material={material} receiveShadow={true}>
+        <boxGeometry
+          args={[BARWIDTH, height, BARWIDTH]}
+          position={[0, height / 2, 0]}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+const App = () => (
+  <>
+    <Header />
+
+    <Canvas camera={{ fov: 90, position: [0, 4, 6] }}>
+      <Plane args={[100, 100]} rotation={[Math.PI / 2, 0, 0]}></Plane>
+      <gridHelper />
+      <ambientLight intensity={0.25} />
+      <pointLight position={[10, 10, 10]} castShadow={true} />
+      <group position={[barValues.length * (BARWIDTH + GAP) * -0.5, 0, 0]}>
+        {barValues.map((value, index) => (
+          <Box
+            key={index}
+            position={[(BARWIDTH + GAP) * index, ((4 / max) * value) / 2, 0]}
+            value={value}
+          />
+        ))}
+        {cityValue.map((value, index) => (
+          <Text
+            fontSize={0.13}
+            position={[(BARWIDTH + GAP) * index, 0.18, 0.6]}
+          >
+            {value}
+          </Text>
+        ))}
+      </group>
+      <OrbitControls></OrbitControls>
+    </Canvas>
+  </>
+);
 
 export default App;
