@@ -147,7 +147,50 @@ function compiledData(range) {
 }
 ```
 
-# Week 1 
+I used a config file to make things nice and tidy 
+
+```js
+export const maxParticles = 80000;
+export const BARWIDTH = 1;
+export const GAP = 0.1;
+export const defaultRange = 10;
+```
+
+The Header component is used to display the input element on the page
+
+```js
+const Header = ({ rangeValue, setrangeValue }) => {
+    // This is used to retrieve the input value when changed.
+    const onchange = (e) => {
+        setrangeValue(e.currentTarget.value);
+    };
+    return (
+        <header>
+            <div className="form">
+                <form>
+                    <label htmlFor="vol">
+                        Aantal getoonde resultaten: {rangeValue}
+                    </label>
+                    <br />
+                    <input
+                        type="range"
+                        id="rangeInput"
+                        name="vol"
+                        min="4"
+                        max="25"
+                        value={rangeValue}
+                        onChange={onchange}
+                    ></input>
+                </form>
+            </div>
+        </header>
+    );
+};
+```
+
+# Process
+
+## Week 1 
 The first week of this course wasn't as productive. This week i decided to use Three.js instead of D3 to make a visualization and i took my time to refresh my React knowledge. 
 
 I decided to create a 3D rendered bar chart to give a spin to the boring 2D chart. 
@@ -201,7 +244,7 @@ function Box(props) {
 This code was very basic and created 3 boxes in a 3D environment.
 
 
-# Week 2
+## Week 2
 Week 2 was a lot more productive, i modulized a lot of my code and managed to reduce a lot of my code.
 
 Before
@@ -300,6 +343,8 @@ Finally i was able to take the processed data and implement this into the 3D cha
 ```
 
 The result of which is [this wonderful 3D chart](https://jortdus.github.io/frontend-application/)
+
+I am very happy with what i was able to do with Three.js in this short amount of time and i will proudly put this on my portfolio website.
 
 
 ## Support
