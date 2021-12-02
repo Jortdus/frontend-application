@@ -1,6 +1,7 @@
 {
   "name": "frontend-application",
   "version": "0.1.0",
+  "homepage": "https://jortdus.github.io/frontend-application/",
   "private": true,
   "dependencies": {
     "@react-spring/three": "^9.3.1",
