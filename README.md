@@ -7,7 +7,6 @@ Track Tech, front-end programming with a focus on visualization.
 
 ## What is this code?
 The code in this repository is a collection of assigments where functional programming is the standard. 
-The code contains Promise based coding, D3.js focused on functional programming 
 
 ## Table of Contents
 * [Features](#features)
