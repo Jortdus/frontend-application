@@ -147,6 +147,160 @@ function compiledData(range) {
 }
 ```
 
+# Week 1 
+The first week of this course wasn't as productive. This week i decided to use Three.js instead of D3 to make a visualization and i took my time to refresh my React knowledge. 
+
+I decided to create a 3D rendered bar chart to give a spin to the boring 2D chart. 
+I started off getting a basic understanding of Three.js and got some helpful tips on renderers and packages that could make it easier to write Three.js.
+
+In week 1 i put my focus on converting some of my code from my last project to React semantic code and i made a basic 3D environment. 
+
+```js
+function Box(props) {
+	// This reference gives us direct access to the THREE.Mesh object
+	const ref = useRef()
+	// Hold state for hovered and clicked events
+	const [hovered, hover] = useState(false)
+	const [clicked, click] = useState(false)
+	// Subscribe this component to the render-loop, rotate the mesh every frame
+	useFrame((state, delta) => {
+		// ref.current.rotation.y += delta / 2
+		// ref.current.rotation.x += delta / 3
+	})
+
+	// Return the view, these are regular Threejs elements expressed in JSX
+	return (
+	<group {...props}>
+		<mesh
+		visible={true}
+		position={[0,0,-0.55]}
+		ref={ref}
+		scale={clicked ? 1.5 : 1}
+		onClick={(event) => click(!clicked)}
+		onPointerOver={(event) => hover(true)}
+		onPointerOut={(event) => hover(false)}>
+		<boxGeometry args={[1, 1, 1]} />
+		<meshStandardMaterial color={hovered ? 'blue' : 'orange'} />
+		
+		</mesh>
+		<Text position={[0, 0, 0]} color="black" anchorX="center" anchorY="middle">text</Text>
+	</group>
+	)
+  }
+
+  const App = () => (
+	<Canvas>
+		<ambientLight />
+		<pointLight position={[10, 10, -10]} />
+		<Box position={[0, -1, 0]} />
+		<OrbitControls></OrbitControls>
+	</Canvas>
+  )
+```
+
+This code was very basic and created 3 boxes in a 3D environment.
+
+
+# Week 2
+Week 2 was a lot more productive, i modulized a lot of my code and managed to reduce a lot of my code.
+
+Before
+```js 
+const covidFetch = fetch('./datasets/covid.json')
+    .then(results => results.json())
+
+// parsing dataset
+function parseCovid() {
+    return covidFetch.then(data => {
+        data.forEach(e => {
+            // filtering out empty results
+            if (e['RNA_flow_per_100000'] == 0) {
+                return
+            } else {
+                // creating a new array containing objectes with particles, location and date
+                cityValue.push({
+                    particles: e['RNA_flow_per_100000'],
+                    location: e['RWZI_AWZI_name'],
+                    date: e['Date_measurement']
+                })
+            }
+        })
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+// preparing data for D3 
+function prepareData(cityValue, range) {
+    let combinedData = cityValue.slice(0, range ? range : 10)
+    return combinedData.map(e => {
+        return [e.particles, e.location]
+    })
+}
+
+function updateData(range) {
+    let compiledData = prepareData(cityValue, range)
+    redraw(compiledData)
+}
+```
+
+After
+```js 
+function compiledData(range) {
+    return Covid.reduce((cityValue, e) => {
+        // filtering out empty results
+        if (e["RNA_flow_per_100000"] === 0) {
+            return cityValue;
+        }
+        // creating a new array containing objectes with particles, location and date
+        cityValue.push({
+            particles: e["RNA_flow_per_100000"],
+            location: e["RWZI_AWZI_name"],
+            date: e["Date_measurement"],
+        });
+        return cityValue;
+    }, [])
+        .slice(0, range ? range : 10)
+        .map((e) => ({
+            ...e,
+            normalizedParticles: Math.floor(e.particles / 1000000000),
+        }));
+}
+```
+
+The readability of the code is much better and uses a lot less code. 
+
+Finally i was able to take the processed data and implement this into the 3D chart.
+
+```js
+        {barValues.map(({ normalizedParticles }, index) => (
+            <React.Fragment key={index}>
+                <Box
+                    // positon bar on bottom of grid so it does not go under the plane.
+                    position={[
+                        (BARWIDTH + GAP) * index,
+                        ((4 / maxParticles) * normalizedParticles) /
+                            2,
+                        0,
+                    ]}
+                    // particles divided by 100.000.000.000, scaled on a value of 80.000
+                    value={normalizedParticles}
+                />
+                <Text
+                    anchorY="bottom"
+                    maxWidth={BARWIDTH - 0.1}
+                    fontSize={0.13}
+                    position={[(BARWIDTH + GAP) * index, 2.8, 0.6]}
+                >
+                    // particles divided by 100.000.000.000
+                    {normalizedParticles}
+                </Text>
+            </React.Fragment>
+        ))}
+```
+
+The result of which is [this wonderful 3D chart](https://jortdus.github.io/frontend-application/)
+
 
 ## Support
 23899@hva.nl
