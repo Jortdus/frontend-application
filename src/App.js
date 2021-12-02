@@ -1,48 +1,17 @@
-import * as THREE from "three";
 import React, { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 import Header from "./components/header";
 import "./App.css";
-import cityCalc from "./cityCalcs";
 import compiledData from "./dataCompile";
 import { throttle } from "lodash";
-
-const material = new THREE.MeshStandardMaterial({
-    color: "#219",
-});
-const max = 80000;
-
-const cityValue = cityCalc();
-
-const BARWIDTH = 1;
-const GAP = 0.1;
-
-function Box({ value, ...props }) {
-    const ref = useRef();
-    let height = (4 / max) * value;
-    return (
-        <group {...props}>
-            <mesh
-                visible={true}
-                ref={ref}
-                material={material}
-                receiveShadow={true}
-            >
-                <boxGeometry
-                    args={[BARWIDTH, height, BARWIDTH]}
-                    position={[0, height / 2, 0]}
-                />
-            </mesh>
-        </group>
-    );
-}
+import { maxParticles, BARWIDTH, GAP } from "./config";
+import Box from "./components/Box";
 
 const App = () => {
     const [rangeValue, setrangeValue] = useState(10);
     const [barValues, setbarValues] = useState(compiledData(rangeValue));
     useEffect(() => {
-        console.log(rangeValue);
         setrangeValue(rangeValue);
     }, [rangeValue]);
     const throttled = useRef(
@@ -60,7 +29,7 @@ const App = () => {
             <Header rangeValue={rangeValue} setrangeValue={setrangeValue} />
 
             <Canvas camera={{ fov: 90, position: [0, 4, 6] }}>
-                <gridHelper />
+                {/* <gridHelper /> */}
                 <ambientLight intensity={0.4} />
                 <pointLight position={[10, 5, 10]} castShadow={true} />
                 <Text
@@ -78,15 +47,16 @@ const App = () => {
                         0,
                     ]}
                 >
-                    {barValues.map((value, index) => (
+                    {barValues.map(({ normalizedParticles }, index) => (
                         <React.Fragment key={index}>
                             <Box
                                 position={[
                                     (BARWIDTH + GAP) * index,
-                                    ((4 / max) * value) / 2,
+                                    ((4 / maxParticles) * normalizedParticles) /
+                                        2,
                                     0,
                                 ]}
-                                value={value}
+                                value={normalizedParticles}
                             />
                             <Text
                                 anchorY="bottom"
@@ -94,20 +64,18 @@ const App = () => {
                                 fontSize={0.13}
                                 position={[(BARWIDTH + GAP) * index, 2.8, 0.6]}
                             >
-                                {value}
+                                {normalizedParticles}
                             </Text>
                         </React.Fragment>
                     ))}
-
-                    {cityValue.map((value, index) => (
+                    {barValues.map(({ location }, index) => (
                         <Text
                             key={index}
-                            anchorY="bottom"
                             maxWidth={BARWIDTH - 0.1}
                             fontSize={0.13}
                             position={[(BARWIDTH + GAP) * index, 0.13, 0.6]}
                         >
-                            {value}
+                            {location}
                         </Text>
                     ))}
                 </group>

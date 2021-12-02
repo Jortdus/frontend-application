@@ -3,14 +3,15 @@ import React from "react";
 const Header = ({ rangeValue, setrangeValue }) => {
     const onchange = (e) => {
         setrangeValue(e.currentTarget.value);
-        console.log(e.currentTarget.value);
     };
     return (
         <header>
-            <div className="logo">
-                <span>Corona sewage particles per 100.000 residents</span>
+            <div className="form">
                 <form>
-                    <label htmlFor="vol">Aantal resultaten:</label>
+                    <label htmlFor="vol">
+                        Aantal getoonde resultaten: {rangeValue}
+                    </label>
+                    <br />
                     <input
                         type="range"
                         id="rangeInput"

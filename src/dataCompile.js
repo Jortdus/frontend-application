@@ -15,10 +15,12 @@ function compiledData(range) {
         return cityValue;
     }, [])
         .slice(0, range ? range : 10)
-        .map((e) => [e.particles, e.location])
-        .map((e) => {
-            return Math.floor(e[0] / 1000000000);
-        });
+        .map((e) => ({
+            ...e,
+            normalizedParticles: Math.floor(e.particles / 1000000000),
+        }));
 }
+
+console.log(compiledData(10));
 
 export default compiledData;
